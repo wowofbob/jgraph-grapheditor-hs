@@ -1,0 +1,32 @@
+name:    jgraph-grapheditor-hs
+version: "0.0.0"
+
+dependencies:
+
+- base >=4.8.2.0 && <4.9 || >=4.9.1.0 && <5
+- wai
+- wai-extra
+- warp
+- http-types
+- containers
+- text
+- filepath
+- bytestring
+
+library:
+  source-dirs: src
+  ghc-options:
+  - -Wall
+  - -fwarn-tabs
+  - -O2
+
+executables:
+  jgraph-grapheditor:
+    main: Main.hs
+    source-dirs: app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - jgraph-grapheditor-hs
