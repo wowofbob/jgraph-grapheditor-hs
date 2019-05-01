@@ -1,4 +1,4 @@
-The files found here doesn't much differ from originals found [here](https://github.com/jgraph/mxgraph). But there are a few changes. Here is a list.
+The files found here doesn't much differ from their [originals](https://github.com/jgraph/mxgraph). But there are a few changes. Here is a list.
 
 Set `cdn/mxgraph` url prefix for loading mxgraph library files in:
 
