@@ -12,6 +12,7 @@ dependencies:
 - text
 - filepath
 - bytestring
+- wai-app-static
 
 library:
   source-dirs: src
