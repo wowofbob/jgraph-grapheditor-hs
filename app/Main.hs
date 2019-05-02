@@ -14,4 +14,7 @@ main = run 3000 $
     (
       mount "mxgraph" (jGraphCdnMxGraphApplication "data/mxgraph")
     )
-  <|> mountRoot (jGraphGraphEditorApplication "data/grapheditor")
+  <|> mountRoot
+        (jGraphGraphEditorMiddleware
+          "data/grapheditor"
+          jGraphGraphEditorApplication)

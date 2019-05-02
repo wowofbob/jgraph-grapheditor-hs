@@ -1,23 +1,27 @@
 {-# LANGUAGE OverloadedStrings #-}
 module JGraph.GraphEditor
-( jGraphGraphEditorApplication
+( jGraphGraphEditorMiddleware
+, jGraphGraphEditorApplication
 ) where
 
-import Network.Wai (Application, requestMethod, responseLBS)
-import Network.HTTP.Types (methodGet, status405)
+import Network.Wai (Application, Middleware, requestMethod, responseLBS)
+import Network.HTTP.Types (methodGet, methodHead, status400)
 import Network.Wai.Application.Static (staticApp, defaultFileServerSettings)
 
-import qualified Data.Map.Lazy as Map
+-- Intercept GET or HEAD request to serve grapheditor's resources.
+jGraphGraphEditorMiddleware :: FilePath -> Middleware
+jGraphGraphEditorMiddleware graphEditorResourcesFilePath application = let
+  serveGraphEditorResources = staticApp
+    (defaultFileServerSettings graphEditorResourcesFilePath)
+  in \request respond -> let
+    method = requestMethod request
+    in (if method == methodGet || method == methodHead
+      then serveGraphEditorResources
+      else application) request respond
 
-jGraphGraphEditorApplication :: FilePath -> Application
-jGraphGraphEditorApplication graphEditorFilePath = let
-  serveGraphEditorResources = staticApp (defaultFileServerSettings graphEditorFilePath)
-  in \request respond -> case
-    Map.lookup
-      (requestMethod request)
-      (Map.fromList
-        [ (methodGet, serveGraphEditorResources request respond)
-        ])
-    of
-      Just result -> result
-      Nothing     -> respond $ responseLBS status405 [] ""
+jGraphGraphEditorApplication :: Application
+jGraphGraphEditorApplication =
+  -- Should handle few grapheditor specific requests
+  -- like POST on /open. Not sure what should be done
+  -- actually, but we'll be ready (later).
+  \_ respond -> respond $ responseLBS status400 [] ""
