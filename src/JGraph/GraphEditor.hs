@@ -3,40 +3,21 @@ module JGraph.GraphEditor
 ( jGraphGraphEditorApplication
 ) where
 
-import System.FilePath
-
-import Network.Wai
-import Network.HTTP.Types
+import Network.Wai (Application, requestMethod, responseLBS)
+import Network.HTTP.Types (methodGet, status405)
+import Network.Wai.Application.Static (staticApp, defaultFileServerSettings)
 
 import qualified Data.Map.Lazy as Map
 
-import qualified Data.Text as Text
-import qualified Data.Text.Encoding as TextEncoding
-
 jGraphGraphEditorApplication :: FilePath -> Application
-jGraphGraphEditorApplication graphEditorFilePath = \request respond ->
-  respond $ case
+jGraphGraphEditorApplication graphEditorFilePath = let
+  serveGraphEditorResources = staticApp (defaultFileServerSettings graphEditorFilePath)
+  in \request respond -> case
     Map.lookup
       (requestMethod request)
       (Map.fromList
-        [ ( methodGet
-          , let
-              filePath = graphEditorFilePath ++ Text.unpack (TextEncoding.decodeUtf8 (rawPathInfo request)) 
-            in responseFile
-                 status200
-                 [
-                   ( "Content-Type"
-                   , case takeExtension filePath of
-                       ".css"  -> "text/css"
-                       ".html" -> "text/html"
-                       ".js"   -> "application/javascript"
-                       _       -> "text/plain"
-                   )
-                 ]
-                 filePath
-                 Nothing
-          )
+        [ (methodGet, serveGraphEditorResources request respond)
         ])
-  of
-    Nothing       -> responseLBS status400 [] ""
-    Just response -> response
+    of
+      Just result -> result
+      Nothing     -> respond $ responseLBS status405 [] ""
